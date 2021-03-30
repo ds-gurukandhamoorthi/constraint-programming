@@ -10,6 +10,12 @@ def IntSquareMatrix(prefix, sz):
             for j in range(sz) ]
     return res
 
+def coerce_eq(variabs, vals):
+    variabs = list(variabs)
+    vals = list(vals)
+    assert len(variabs) == len(vals), 'Lengths of the variables and values must be equal for the intended coercing between them'
+    return And([ var == v for var, v in zip(variabs, vals) ])
+
 # Number of towers seen from left
 # [4, 3, 5, 2, 1] -> 2  (tower of height 4 and tower of height 5 are seen)
 def nb_towers_visible(heights):
@@ -23,9 +29,8 @@ def nb_towers_visible(heights):
 
 def constrain_towers(tower_vars, tower_height, knowl):
     possiblts = knowl[tower_height]
-    constrain_single = lambda possib: And([twr == h
-        for twr, h in zip(tower_vars, possib)])
-    all_possiblts = [constrain_single(possib) for possib in possiblts]
+    all_possiblts = [ coerce_eq(tower_vars, possib)
+            for possib in possiblts ]
     return Or(all_possiblts)
 
 def gen_knowl_dict(n):
