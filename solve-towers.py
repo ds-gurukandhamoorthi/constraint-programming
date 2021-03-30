@@ -31,7 +31,7 @@ def constrain_towers(tower_vars, tower_height, knowl):
     possiblts = knowl[tower_height]
     all_possiblts = [ coerce_eq(tower_vars, possib)
             for possib in possiblts ]
-    return Or(all_possiblts)
+    return AtMost(*all_possiblts, 1)
 
 def gen_knowl_dict(n):
     knowl_dict = defaultdict(list)
