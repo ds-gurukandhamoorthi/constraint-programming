@@ -31,7 +31,8 @@ def constrain_towers(tower_vars, tower_height, knowl):
     possiblts = knowl[tower_height]
     all_possiblts = [ coerce_eq(tower_vars, possib)
             for possib in possiblts ]
-    return AtMost(*all_possiblts, 1)
+    # Exactly one possibility among all would satisfy. PbEq expresses this correctly
+    return PbEq([ (p, 1) for p in all_possiblts ], 1)
 
 def gen_knowl_dict(n):
     knowl_dict = defaultdict(list)
