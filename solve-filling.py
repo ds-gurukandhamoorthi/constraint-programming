@@ -105,13 +105,42 @@ def solve_puzzle_range(puzzle, *, height, width):
     complete_c = [ And(0 < cell, cell < height * width + 1)
             for cell in flatten(board) ]
 
-    s = Solver()
+    opt = Optimize()
+    opt.add(complete_c + contig_c + instance_c)
+    cost = Int('cost')
+    opt.add(cost == Sum(vars_))
+    h = opt.minimize(cost)
+    opt.check()
+    opt.lower(h)
+    m = opt.model()
+    solution_model = [ [ m[cell].as_long() for cell in row] for row in board ]
 
-    s.add(complete_c + contig_c + instance_c)
+    optimizer_check_model = opt
+    while True:
+        print('checking solution')
+        print(solution_model)
+        optimizer_check_model.push()
+        contig_model_c = gen_contiguous_constraints(solution_model, **pars)
+        instance_model_c = [ var == val
+                for var, val in zip(vars_, flatten(solution_model))
+                if val > 0]
+        # check that the numbers in the solution verifies the
+        # contiguouness constraint
+        optimizer_check_model.add(contig_model_c)
+        optimizer_check_model.add(instance_model_c) # redundant?
+        if optimizer_check_model.check() == sat:
+                return solution_model #HERE IS THE RETURN STATEMENT
+        print('rejecting solution')
+        print(solution_model)
 
-    s.check()
-    m = s.model()
-    return [ [m[cell] for cell in row] for row in board ]
+        optimizer_check_model.pop()
+        # the rejected solution is added after 'pop'. This is how it is
+        # added to the model
+        optimizer_check_model.add(Not(And(instance_model_c)))
+        optimizer_check_model.check()
+        optimizer_check_model.lower(h)
+        m = optimizer_check_model.model()
+        solution_model = [ [ m[cell].as_long() for cell in row ] for row in board ]
 
 if __name__ == "__main__":
     puzzle_h9_w13 = [
@@ -147,8 +176,3 @@ if __name__ == "__main__":
     width, height= 17, 13 # a.k.a nb_columns, nb_rows
 
     solve_puzzle_range(puzzle_h13_w17, height=height, width=width)
-    # the solution generated now has 2 or 1 at (3, 8). We can only have 1 there
-    # FIXME: There are currently no constraints saying that the 
-    # numbers inserted satisfy the constraints:
-    # so we need to check the solution_instance  verifies all
-    # conditions by pushing/popping a new state and giving the puzzle
