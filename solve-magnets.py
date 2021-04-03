@@ -15,19 +15,27 @@ def IntMatrix(prefix, nb_rows, nb_cols):
                             for i in range(nb_rows) ]
     return res
 
+# Exactly(1) -> False, Exactly(0) -> True, Exactly(2) -> False.
+# As would PbEq([ (p, 1) for p in [] ], 1)
+def Exactly(*args):
+    assert len(args) >= 1, 'Non empty list of arguments expected'
+    return PbEq([
+        (arg, 1) for arg in args[:-1]],
+        args[-1])
 
 # what it means that the total of charges is count_
 def coerce_charge(edges, polarity, count_):
-        return PbEq([ (edge == polarity, 1)
-            for edge in edges ], count_)
+        edges_with_given_polarity = [ edge == polarity
+                for edge in edges ]
+        return Exactly(*edges_with_given_polarity, count_)
 
 # what it means to be a tile:
 def coerce_tile(edge_1, edge_2):
-    return PbEq([
-        (And(edge_1 == POSITIVE, edge_2 == NEGATIVE), 1),
-        (And(edge_1 == NEGATIVE, edge_2 == POSITIVE), 1),
-        (And(edge_1 == NEUTRAL, edge_2 == NEUTRAL), 1),
-        ], 1)
+    return Exactly(
+        And(edge_1 == POSITIVE, edge_2 == NEGATIVE),
+        And(edge_1 == NEGATIVE, edge_2 == POSITIVE),
+        And(edge_1 == NEUTRAL, edge_2 == NEUTRAL),
+        1)
 
 # what it means to be neighbours in the board
 def coerce_neigh(edge_1, edge_2):

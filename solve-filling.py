@@ -15,6 +15,14 @@ def coerce_eq(variabs, vals):
     assert len(variabs) == len(vals), 'Lengths of the variables and values must be equal for the intended coercing between them'
     return And([ var == v for var, v in zip(variabs, vals) ])
 
+# Exactly(1) -> False, Exactly(0) -> True, Exactly(2) -> False.
+# As would PbEq([ (p, 1) for p in [] ], 1)
+def Exactly(*args):
+    assert len(args) >= 1, 'Non empty list of arguments expected'
+    return PbEq([
+        (arg, 1) for arg in args[:-1]],
+        args[-1])
+
 # direction = up, down, left, right, -1, +1, -1, +1
 
 # index = line, column
@@ -79,7 +87,7 @@ def gen_contiguous_constraints_single(index_, count_, *, width, height, board, p
                 coerce_eq(block_vars, [count_] * len(block_vars)),
                 And([var != count_ for var in fence_var]))
         possibs.append(simplify(fenced_enclosure))
-    return PbEq([(p, 1) for p in possibs], 1) #only one configuration would prevail
+    return Exactly(*possibs, 1) #only one configuration would prevail
 
 def gen_contiguous_constraints(puzzle, board, *, width, height):
     pars = {'board': board, 'width': width,

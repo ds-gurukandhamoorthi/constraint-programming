@@ -16,6 +16,14 @@ def coerce_eq(variabs, vals):
     assert len(variabs) == len(vals), 'Lengths of the variables and values must be equal for the intended coercing between them'
     return And([ var == v for var, v in zip(variabs, vals) ])
 
+# Exactly(1) -> False, Exactly(0) -> True, Exactly(2) -> False.
+# As would PbEq([ (p, 1) for p in [] ], 1)
+def Exactly(*args):
+    assert len(args) >= 1, 'Non empty list of arguments expected'
+    return PbEq([
+        (arg, 1) for arg in args[:-1]],
+        args[-1])
+
 # Number of towers seen from left
 # [4, 3, 5, 2, 1] -> 2  (tower of height 4 and tower of height 5 are seen)
 def nb_towers_visible(heights):
@@ -31,8 +39,8 @@ def constrain_towers(tower_vars, tower_height, knowl):
     possiblts = knowl[tower_height]
     all_possiblts = [ coerce_eq(tower_vars, possib)
             for possib in possiblts ]
-    # Exactly one possibility among all would satisfy. PbEq expresses this correctly
-    return PbEq([ (p, 1) for p in all_possiblts ], 1)
+    # Exactly one possibility among all would satisfy.
+    return Exactly(*all_possiblts, 1)
 
 def gen_knowl_dict(n):
     knowl_dict = defaultdict(list)
