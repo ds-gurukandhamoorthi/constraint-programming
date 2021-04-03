@@ -43,7 +43,7 @@ def get_block(index_, *, nb_cells, is_valid_cell):
                         if is_valid_cell(neigh):
                             res.add(tuple(sorted([neigh, *bl])))
         return res
-                
+
 # for a given enclosure find its fence/frontier for the given distance
 def get_fence(*,enclosure):
     area_and_fence = set()
@@ -70,7 +70,7 @@ def gen_contiguous_constraints_single(index_, count_, *, width, height, board, p
     for block in blocks:
         block_vars = [ at_(*ind) for ind in block ]
         # fence can be thought of as completely encircling the block
-        fence = get_fence(enclosure=block) 
+        fence = get_fence(enclosure=block)
         geom = { 'width': width, 'height': height }
         fence_inside_board = [ ind for ind in fence
                 if inside_board(ind, **geom) ]
@@ -105,8 +105,37 @@ def solve_puzzle_range(puzzle, *, height, width):
     complete_c = [ And(0 < cell, cell < height * width + 1)
             for cell in flatten(board) ]
 
+    # The model wants the numbers outside the block to be different than
+    # the number (count) in the block. But to resolve this constraint it
+    # uses big numbers 32, 211 ... until the max we've put.
+    # It doesn't try 1 there.
+    # So it exhausts (if we have two 1) 221 * 221 = 48841 possbilities.
+    # We want to avoid that by saying Except for 1 all other counts have at least
+    # one neighbour that is equal to it.
+    # We have dodged the problem by using an optimizer (minimize cost).
+    # But it is better to encode and incoroporate this constraint in the model.
+    geom = { 'width': width, 'height': height }
+    at_ = lambda l, c : board[l][c]
+    def valid_neighbours(l, c):
+        return [ neigh for neigh in neighbours((l, c))
+                if inside_board(neigh, **geom) ]
+    def at_least_one_neighbour_is_same(l, c):
+        return Or([ at_(l, c) == at_(*neigh)
+                for neigh in valid_neighbours(l, c) ])
+    ortho_neigh_c = [ Xor(
+        board[l][c] == 1,
+        at_least_one_neighbour_is_same(l, c))
+        for l, c in itertools.product(range(height), range(width)) ]
+
+    # s = Solver()
+    # s.add(complete_c + contig_c + instance_c + ortho_neigh_c)
+    # s.check()
+    # m = s.model()
+    # solution_model = [ [ m[cell].as_long() for cell in row] for row in board ]
+    # return solution_model
+
     opt = Optimize()
-    opt.add(complete_c + contig_c + instance_c)
+    opt.add(complete_c + contig_c + instance_c + ortho_neigh_c)
     cost = Int('cost')
     opt.add(cost == Sum(vars_))
     h = opt.minimize(cost)
