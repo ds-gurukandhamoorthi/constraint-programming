@@ -1,29 +1,13 @@
 from z3 import *
 import itertools
 from collections import defaultdict
-
-#transpose a square matrix
-transpose = lambda m: list(zip(*m))
-
-def flatten(list_of_lists):
-    return list(itertools.chain(*list_of_lists))
-
-def IntSquareMatrix(prefix, sz):
-    res = [[ Int(f'{prefix}_{i}_{j}') for i in range(sz)]
-            for j in range(sz) ]
-    return res
+from more_z3 import IntMatrix
+from puzzles_common import transpose, flatten, gen_latin_square_constraints
 
 def solve_unequal(puzzle, *, order, lt_inequalities):
-    X = IntSquareMatrix('n', order)
-    X_trans = transpose(X)
+    X = IntMatrix('n', order, order)
 
-    numbers = itertools.chain(*X)
-    _range_c = [ And(n >= 1, n <= order) for n in numbers ]
-
-    _row_c = [ Distinct(row) for row in X ]
-    _col_c = [ Distinct(row) for row in X_trans ]
-
-    latin_c = _range_c + _row_c + _col_c
+    latin_c = gen_latin_square_constraints(X, order)
 
 
     vars_ = flatten(X)

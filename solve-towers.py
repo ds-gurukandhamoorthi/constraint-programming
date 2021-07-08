@@ -1,28 +1,8 @@
 from z3 import *
 import itertools
 from collections import defaultdict
-
-#transpose a square matrix
-transpose = lambda m: list(zip(*m))
-
-def IntSquareMatrix(prefix, sz):
-    res = [[ Int(f'{prefix}_{i}_{j}') for i in range(sz)]
-            for j in range(sz) ]
-    return res
-
-def coerce_eq(variabs, vals):
-    variabs = list(variabs)
-    vals = list(vals)
-    assert len(variabs) == len(vals), 'Lengths of the variables and values must be equal for the intended coercing between them'
-    return And([ var == v for var, v in zip(variabs, vals) ])
-
-# Exactly(1) -> False, Exactly(0) -> True, Exactly(2) -> False.
-# As would PbEq([ (p, 1) for p in [] ], 1)
-def Exactly(*args):
-    assert len(args) >= 1, 'Non empty list of arguments expected'
-    return PbEq([
-        (arg, 1) for arg in args[:-1]],
-        args[-1])
+from puzzles_common import transpose, gen_latin_square_constraints
+from more_z3 import IntMatrix, Exactly, coerce_eq
 
 # Number of towers seen from left
 # [4, 3, 5, 2, 1] -> 2  (tower of height 4 and tower of height 5 are seen)
@@ -51,17 +31,13 @@ def gen_knowl_dict(n):
 
 def solve_tower_puzzle(n, top, left, right, bottom, instance=None):
     knowl = gen_knowl_dict(n)
-    X = IntSquareMatrix('h', n)
+    X = IntMatrix('h', n, n)
     X_trans = transpose(X)
 
     assert len(top) == len(left) == n
     assert len(right) == len(bottom) == n
 
-    heights = itertools.chain(*X)
-    heights_c = [ And(h >= 1, h <= n) for h in heights ]
-
-    row_c = [ Distinct(row) for row in X ]
-    col_c = [ Distinct(row) for row in X_trans ]
+    latin_c = gen_latin_square_constraints(X, n)
 
     left_c = [ constrain_towers(row, h, knowl)
             for row, h in zip(X, left) if h > 0 ]
@@ -74,8 +50,7 @@ def solve_tower_puzzle(n, top, left, right, bottom, instance=None):
             for row, h in zip(X_trans, bottom) if h > 0 ]
 
     s = Solver()
-    s.add(heights_c + row_c + col_c +
-           left_c + right_c + top_c + bottom_c)
+    s.add( latin_c + left_c + right_c + top_c + bottom_c )
 
     if instance is not None:
         for row_v, row in zip(X, instance):
@@ -88,8 +63,6 @@ def solve_tower_puzzle(n, top, left, right, bottom, instance=None):
 
     res = [[ m[s] for s in row] for row in X]
     return res
-
-
 
 if __name__ == "__main__":
     # top and bottom read the heights from left to right in the puzzle

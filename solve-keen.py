@@ -1,14 +1,8 @@
 from z3 import *
 import itertools
 from collections import defaultdict
-
-#transpose a square matrix
-transpose = lambda m: list(zip(*m))
-
-def IntSquareMatrix(prefix, sz):
-    res = [[ Int(f'{prefix}_{i}_{j}') for i in range(sz)]
-            for j in range(sz) ]
-    return res
+from more_z3 import IntMatrix
+from puzzles_common import gen_latin_square_constraints
 
 # We group by content. all cells containing 0 for example
 def get_same_block_indices(matrix):
@@ -18,21 +12,8 @@ def get_same_block_indices(matrix):
             res[val].append((l, c))
     return res
 
-def gen_latin_square_constraints(matrix, order):
-    assert len(matrix) == order
-    assert len(transpose(matrix)) == order
-    numbers = itertools.chain(*matrix)
-    range_c = [ And(n >= 1, n <= order) for n in numbers ]
-
-    row_c = [ Distinct(row) for row in matrix ]
-    col_c = [ Distinct(row) for row in transpose(matrix) ]
-
-    return range_c + row_c + col_c
-
-
-
 def solve_keen(puzzle, *, order, arithmetic_constraints):
-    X = IntSquareMatrix('n', order)
+    X = IntMatrix('n', order, order)
 
     at_ = lambda l, c : X[l][c]
     def get_vars_at(indices):
@@ -55,9 +36,6 @@ def solve_keen(puzzle, *, order, arithmetic_constraints):
             assert len(vars_) == 2, 'Division needs exactly two operands'
             a, b = vars_
             arith_c.append(Or(a / b == result, b / a == result))
-    # NOTE: the variable are noted diffrently : n_2_1 (as if it were x,y axis 
-    # instead of l,c line column but the result is ok because ..
-    # .. we don't depend on the naming convention
 
     latin_c = gen_latin_square_constraints(X, order)
 

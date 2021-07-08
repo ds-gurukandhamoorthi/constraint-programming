@@ -1,27 +1,10 @@
 import itertools
 from z3 import *
+from more_z3 import IntMatrix, Exactly
+from puzzles_common import transpose, flatten
 
 # polarities
 POSITIVE, NEUTRAL, NEGATIVE = 1, 0, -1
-
-#transpose a matrix
-transpose = lambda m: list(zip(*m))
-
-def flatten(list_of_lists):
-    return list(itertools.chain(*list_of_lists))
- 
-def IntMatrix(prefix, nb_rows, nb_cols):
-    res = [[ Int(f'{prefix}_{i}_{j}') for j in range(nb_cols)]
-                            for i in range(nb_rows) ]
-    return res
-
-# Exactly(1) -> False, Exactly(0) -> True, Exactly(2) -> False.
-# As would PbEq([ (p, 1) for p in [] ], 1)
-def Exactly(*args):
-    assert len(args) >= 1, 'Non empty list of arguments expected'
-    return PbEq([
-        (arg, 1) for arg in args[:-1]],
-        args[-1])
 
 # what it means that the total of charges is count_
 def coerce_charge(edges, polarity, count_):

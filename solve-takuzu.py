@@ -1,19 +1,10 @@
 import itertools
 from more_itertools import windowed
 from z3 import *
-
-#transpose a matrix
-transpose = lambda m: list(zip(*m))
+from more_z3 import IntMatrix
+from puzzles_common import flatten, transpose
 
 BLACK, WHITE = 0, 1
-
-def flatten(list_of_lists):
-    return list(itertools.chain(*list_of_lists))
-
-def IntMatrix(prefix, nb_rows, nb_cols):
-    res = [[ Int(f'{prefix}_{i}_{j}') for j in range(nb_cols)]
-                            for i in range(nb_rows) ]
-    return res
 
 def solve_puzzle_takuzu(puzzle, *, height, width):
     board = IntMatrix('b', nb_rows=height, nb_cols=width)

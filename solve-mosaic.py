@@ -1,27 +1,10 @@
 import itertools
 from z3 import *
+from more_z3 import IntMatrix, coerce_eq
+from puzzles_common import flatten, inside_board
 
 # We need count of black squares: so BLACK=1
 WHITE, BLACK = 0, 1
-
-def flatten(list_of_lists):
-    return list(itertools.chain(*list_of_lists))
-
-def IntMatrix(prefix, nb_rows, nb_cols):
-    res = [[ Int(f'{prefix}_{i}_{j}') for j in range(nb_cols)]
-                            for i in range(nb_rows) ]
-    return res
-
-def coerce_eq(variabs, vals):
-    variabs = list(variabs)
-    vals = list(vals)
-    assert len(variabs) == len(vals), 'Lengths of the variables and values must be equal for the intended coercing between them'
-    return And([ var == v for var, v in zip(variabs, vals) ])
-
-# index = line, column
-def inside_board(index_lc, *, height, width):
-    l, c = index_lc
-    return (0 <= l < height) and (0 <= c < width)
 
 # disk: all cells (including the center cell included)
 # here convention: radius = 0 returns merely the center cell

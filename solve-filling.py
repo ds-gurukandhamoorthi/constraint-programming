@@ -1,34 +1,9 @@
 import itertools
 from z3 import *
-
-def flatten(list_of_lists):
-    return list(itertools.chain(*list_of_lists))
-
-def IntMatrix(prefix, nb_rows, nb_cols):
-    res = [[ Int(f'{prefix}_{i}_{j}') for j in range(nb_cols)]
-                            for i in range(nb_rows) ]
-    return res
-
-def coerce_eq(variabs, vals):
-    variabs = list(variabs)
-    vals = list(vals)
-    assert len(variabs) == len(vals), 'Lengths of the variables and values must be equal for the intended coercing between them'
-    return And([ var == v for var, v in zip(variabs, vals) ])
-
-# Exactly(1) -> False, Exactly(0) -> True, Exactly(2) -> False.
-# As would PbEq([ (p, 1) for p in [] ], 1)
-def Exactly(*args):
-    assert len(args) >= 1, 'Non empty list of arguments expected'
-    return PbEq([
-        (arg, 1) for arg in args[:-1]],
-        args[-1])
+from more_z3 import IntMatrix, coerce_eq, Exactly
+from puzzles_common import flatten, inside_board
 
 # direction = up, down, left, right, -1, +1, -1, +1
-
-# index = line, column
-def inside_board(index_lc, *, height, width):
-    l, c = index_lc
-    return (0 <= l < height) and (0 <= c < width)
 
 def neighbours(index_):
     up, down, left, right = (1, 1, 1, 1)

@@ -1,32 +1,9 @@
 import itertools
 from z3 import *
-
-#transpose a matrix
-transpose = lambda m: list(zip(*m))
+from more_z3 import IntMatrix, coerce_eq, Exactly
+from puzzles_common import flatten, transpose, inside_board
 
 BLACK, WHITE = 0, 1
-
-def flatten(list_of_lists):
-    return list(itertools.chain(*list_of_lists))
-
-def IntMatrix(prefix, nb_rows, nb_cols):
-    res = [[ Int(f'{prefix}_{i}_{j}') for j in range(nb_cols)]
-                            for i in range(nb_rows) ]
-    return res
-
-def coerce_eq(variabs, vals):
-    variabs = list(variabs)
-    vals = list(vals)
-    assert len(variabs) == len(vals), 'Lengths of the variables and values must be equal for the intended coercing between them'
-    return And([ var == v for var, v in zip(variabs, vals) ])
-
-# Exactly(1) -> False, Exactly(0) -> True, Exactly(2) -> False.
-# As would PbEq([ (p, 1) for p in [] ], 1)
-def Exactly(*args):
-    assert len(args) >= 1, 'Non empty list of arguments expected'
-    return PbEq([
-        (arg, 1) for arg in args[:-1]],
-        args[-1])
 
 # sort of subset_sum
 def distribute_in_4_directions(total):
@@ -38,11 +15,6 @@ def distribute_in_4_directions(total):
                         yield(i, j, k, l)
 
 # direction = up, down, left, right, -1, +1, -1, +1
-
-# index = line, column
-def inside_board(index_lc, *, height, width):
-    l, c = index_lc
-    return (0 <= l < height) and (0 <= c < width)
 
 # can also be thought of as 'circle' for a distance
 # how much it spawns in each direction

@@ -1,11 +1,9 @@
 from z3 import *
 from more_z3 import coerce_eq, coerce_ge, coerce_le, IntMatrix, Exactly
 import itertools
+from puzzles_common import transpose
 
 BLACK, WHITE = 0, 1
-
-#transpose a matrix
-transpose = lambda m: list(zip(*m))
 
 def distribute_in_n_direc(n, total):
     assert n >= 2, 'The total is distributed in at least n directions|bins'
@@ -59,8 +57,6 @@ def solve_pattern(runs_columnwise, runs_rowwise, height, width):
     s.check()
     m = s.model()
     return [ [ m[cell] for cell in row] for row in X ]
-
-
 
 
 if __name__ == "__main__":
