@@ -1,24 +1,7 @@
 import itertools
 from z3 import *
-
-#transpose a matrix
-transpose = lambda m: list(zip(*m))
-
-def flatten(list_of_lists):
-    return list(itertools.chain(*list_of_lists))
-
-def IntMatrix(prefix, nb_rows, nb_cols):
-    res = [[ Int(f'{prefix}_{i}_{j}') for j in range(nb_cols)]
-                            for i in range(nb_rows) ]
-    return res
-
-# Exactly(1) -> False, Exactly(0) -> True, Exactly(2) -> False.
-# As would PbEq([ (p, 1) for p in [] ], 1)
-def Exactly(*args):
-    assert len(args) >= 1, 'Non empty list of arguments expected'
-    return PbEq([
-        (arg, 1) for arg in args[:-1]],
-        args[-1])
+from more_z3 import IntMatrix, Exactly
+from puzzles_common import flatten, transpose, inside_board
 
 def neighbours(index_):
     up, down, left, right = (1, 1, 1, 1)
@@ -27,11 +10,6 @@ def neighbours(index_):
         (l+down, c),
         (l, c-left),
         (l, c+right)]
-
-# index = line, column
-def inside_board(index_lc, *, height, width):
-    l, c = index_lc
-    return (0 <= l < height) and (0 <= c < width)
 
 # We choose tree = 1.. tent = -1, -2.. we use this id later for couplings
 def preprocess(board, *, height, width):
@@ -48,6 +26,7 @@ def preprocess(board, *, height, width):
 def solve_tents(board, *, height, width, horizontal_tents, vertical_tents):
     preprocessed = preprocess(board, height=height, width=width)
     X = IntMatrix('t', nb_rows=height, nb_cols=width)
+
     at_ = lambda l, c: X[l][c]
     is_tree = lambda l, c: preprocessed[l][c] > 0
     # the coupling between a tree and a tent is unique. Think tile|domino
@@ -121,6 +100,7 @@ def solve_tents(board, *, height, width, horizontal_tents, vertical_tents):
            coupling_c + tree_proximity_c +
            same_number_trees_tents_c +
            row_sums_c + col_sums_c)
+    s.check()
     m = s.model()
     return [ [ m[cell] for cell in row ] for row in X ]
 
@@ -138,9 +118,6 @@ if __name__ == "__main__":
             'horizontal_tents': [3, 0, 2, 1, 1, 1, 1, 1, 2],
             'vertical_tents': [3, 1, 3, 0, 4, 0, 1],
             }
-
-    preprocess(pars['board'], height=pars['height'],
-            width=pars['width'])
 
     solve_tents(**pars)
 
