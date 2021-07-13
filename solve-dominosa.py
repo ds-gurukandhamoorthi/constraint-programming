@@ -5,9 +5,6 @@ from more_itertools import pairwise
 import itertools
 from collections import defaultdict
 
-def all_unique(lst):
-    return len(lst) == len(set(lst))
-
 HORIZ_START, HORIZ_END, VERTIC_START, VERTIC_END = -1, -2, 1, 2
 
 def normalize_domino(domino):
