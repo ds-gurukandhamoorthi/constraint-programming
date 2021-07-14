@@ -28,7 +28,7 @@ def solve_killer_sudoku(puzzle, *, sums):
     def get_vars_at(indices):
         return [ at_(*ind) for ind in indices ]
 
-    latin_c = gen_latin_square_constraints(X, 9)
+    latin_c = gen_latin_square_constraints(X, ORDER)
 
     nonet_c = []
     nonets_inds = get_same_block_indices(NONETS_IDS)
@@ -37,15 +37,15 @@ def solve_killer_sudoku(puzzle, *, sums):
         nonet_c.append(Distinct(vars_))
 
     #sum of distinct numbers
-    sum_distinct_c = []
-    blocks_inds = get_same_block_indices(puzzle)
-    for sums_ind, board_indices in blocks_inds.items():
-        vars_ = get_vars_at(board_indices)
+    cage_c = []
+    cages_inds = get_same_block_indices(puzzle)
+    for sums_ind, cage_indices in cages_inds.items():
+        vars_ = get_vars_at(cage_indices)
         cstrnt = And(Distinct(vars_), Sum(vars_) == sums[sums_ind])
-        sum_distinct_c.append(cstrnt)
+        cage_c.append(cstrnt)
 
     s = Solver()
-    s.add( latin_c + nonet_c + sum_distinct_c)
+    s.add( latin_c + nonet_c + cage_c )
     s.check()
     
     m = s.model()
