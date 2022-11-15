@@ -1,5 +1,6 @@
 import itertools
 from z3 import And, Distinct
+from collections import defaultdict
 
 #transpose a square matrix
 transpose = lambda m: list(zip(*m))
@@ -23,3 +24,12 @@ def gen_latin_square_constraints(matrix, order):
     col_c = [ Distinct(row) for row in transpose(matrix) ]
 
     return range_c + row_c + col_c
+
+# We group by content. all cells containing 0 for example
+def get_same_block_indices(matrix):
+    res = defaultdict(list)
+    for l, row in enumerate(matrix):
+        for c, val in enumerate(row):
+            res[val].append((l, c))
+    return res
+

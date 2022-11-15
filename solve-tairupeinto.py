@@ -1,18 +1,9 @@
 import itertools
 from z3 import *
 from more_z3 import IntMatrix, coerce_eq, Exactly
-from puzzles_common import flatten, transpose
-from collections import defaultdict
+from puzzles_common import flatten, transpose, get_same_block_indices
 
 WHITE, BLACK = 0, 1
-
-# We group by content. all cells containing 0 for example
-def get_same_block_indices(matrix):
-    res = defaultdict(list)
-    for l, row in enumerate(matrix):
-        for c, val in enumerate(row):
-            res[val].append((l, c))
-    return res
 
 def solve_puzzle_tairupeinto(*, height, width, cage_ids, vertical_counts, horizontal_counts):
     board = IntMatrix('c', nb_rows=height, nb_cols=width)

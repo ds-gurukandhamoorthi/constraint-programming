@@ -1,16 +1,7 @@
 from z3 import *
 import itertools
-from collections import defaultdict
 from more_z3 import IntMatrix
-from puzzles_common import gen_latin_square_constraints
-
-# We group by content. all cells containing 0 for example
-def get_same_block_indices(matrix):
-    res = defaultdict(list)
-    for l, row in enumerate(matrix):
-        for c, val in enumerate(row):
-            res[val].append((l, c))
-    return res
+from puzzles_common import gen_latin_square_constraints, get_same_block_indices
 
 def solve_keen(puzzle, *, order, arithmetic_constraints):
     X = IntMatrix('n', order, order)

@@ -1,15 +1,7 @@
 from z3 import *
 import itertools
-from collections import defaultdict
 from more_z3 import IntMatrix
-
-# We group by content. all cells containing 0 for example
-def get_same_block_indices(matrix):
-    res = defaultdict(list)
-    for l, row in enumerate(matrix):
-        for c, val in enumerate(row):
-            res[val].append((l, c))
-    return res
+from puzzles_common import get_same_block_indices
 
 def solve_kakuro(horiz_cages, vertic_cages, horiz_clues, vertic_clues, *, order):
     X = IntMatrix('n', order, order)
