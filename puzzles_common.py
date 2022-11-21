@@ -33,3 +33,9 @@ def get_same_block_indices(matrix):
             res[val].append((l, c))
     return res
 
+# serve first the rows then columns. (whatever their length be)
+def rows_and_cols(matrix):
+    # serve rows
+    yield from matrix
+    # serve columns. same as yield from tranpose(matrix)
+    yield from zip(*matrix)
