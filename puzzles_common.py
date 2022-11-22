@@ -39,3 +39,12 @@ def rows_and_cols(matrix):
     yield from matrix
     # serve columns. same as yield from tranpose(matrix)
     yield from zip(*matrix)
+
+# orthogonal neighbours
+def ortho_neighbours(index_):
+    up, down, left, right = (1, 1, 1, 1)
+    l, c = index_
+    return [(l-up, c),
+        (l+down, c),
+        (l, c-left),
+        (l, c+right)]

@@ -2,14 +2,7 @@ import itertools
 from z3 import *
 from more_z3 import IntMatrix, Exactly
 from puzzles_common import flatten, transpose, inside_board
-
-def neighbours(index_):
-    up, down, left, right = (1, 1, 1, 1)
-    l, c = index_
-    return [(l-up, c),
-        (l+down, c),
-        (l, c-left),
-        (l, c+right)]
+from puzzles_common import ortho_neighbours as neighbours
 
 # We choose tree = 1.. tent = -1, -2.. we use this id later for couplings
 def preprocess(board, *, height, width):

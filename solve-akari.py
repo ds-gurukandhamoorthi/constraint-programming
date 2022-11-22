@@ -6,14 +6,7 @@ from funcy import isnone
 from more_itertools import split_when
 from funcy import walk_keys, walk_values
 from funcy import partial, compose
-
-def neighbours(index_):
-    up, down, left, right = (1, 1, 1, 1)
-    l, c = index_
-    return [(l-up, c),
-        (l+down, c),
-        (l, c-left),
-        (l, c+right)]
+from puzzles_common import ortho_neighbours as neighbours
 
 LIGHT_BULB, NOT_LIGHT_BULB = 1, 0
 WALL = -1

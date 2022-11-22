@@ -2,14 +2,7 @@ from z3 import *
 import itertools
 from more_z3 import IntMatrix, Exactly
 from puzzles_common import transpose, inside_board
-
-def neighbours(index_):
-    up, down, left, right = (1, 1, 1, 1)
-    l, c = index_
-    return [(l-up, c),
-        (l+down, c),
-        (l, c-left),
-        (l, c+right)]
+from puzzles_common import ortho_neighbours as neighbours
 
 def solve_tracks(*, tracks, start_index, end_index, horizontal_clues, vertical_clues, height, width):
     X = IntMatrix('t', nb_rows=height, nb_cols=width)

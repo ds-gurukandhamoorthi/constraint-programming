@@ -3,16 +3,9 @@ from z3 import *
 from more_z3 import IntMatrix, coerce_eq, Exactly
 from puzzles_common import flatten, transpose, inside_board
 from more_itertools import pairwise
+from puzzles_common import ortho_neighbours as neighbours
 
 BLACK, WHITE = 0, 1
-
-def neighbours(index_):
-    up, down, left, right = (1, 1, 1, 1)
-    l, c = index_
-    return [(l-up, c),
-        (l+down, c),
-        (l, c-left),
-        (l, c+right)]
 
 def solve_puzzle_hitori(puzzle, *, height, width):
     color_board = IntMatrix('c', nb_rows=height, nb_cols=width)

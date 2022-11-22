@@ -4,17 +4,10 @@ from more_z3 import IntMatrix, coerce_eq, Exactly
 from puzzles_common import flatten, transpose, inside_board
 from collections import defaultdict
 from more_itertools import pairwise
+from puzzles_common import ortho_neighbours as neighbours
 
 WALL, POROUS = 1, 0
 IN_THE_LOOP, OUT_OF_THE_LOOP = 1, 0
-
-def neighbours(index_):
-    up, down, left, right = (1, 1, 1, 1)
-    l, c = index_
-    return [(l-up, c),
-        (l+down, c),
-        (l, c-left),
-        (l, c+right)]
 
 def solve_puzzle_slitherlink(puzzle, *, height, width):
     board = IntMatrix('c', nb_rows=height, nb_cols=width)

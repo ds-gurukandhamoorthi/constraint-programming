@@ -3,18 +3,10 @@ from z3 import *
 from more_z3 import IntMatrix, coerce_eq, Exactly
 from puzzles_common import flatten, inside_board, transpose
 from more_itertools import pairwise
+from puzzles_common import ortho_neighbours as neighbours
 
 BLACK, WHITE = 0, 1
 # We use id=0 (BLACK) id of block > 0 (WHITE)
-
-def neighbours(index_):
-    up, down, left, right = (1, 1, 1, 1)
-    l, c = index_
-    return [(l-up, c),
-        (l+down, c),
-        (l, c-left),
-        (l, c+right)]
-
 
 def solve_puzzle_nurikabe(puzzle, *, height, width):
 

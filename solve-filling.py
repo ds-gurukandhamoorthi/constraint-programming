@@ -2,16 +2,9 @@ import itertools
 from z3 import *
 from more_z3 import IntMatrix, coerce_eq, Exactly
 from puzzles_common import flatten, inside_board
+from puzzles_common import ortho_neighbours as neighbours
 
 # direction = up, down, left, right, -1, +1, -1, +1
-
-def neighbours(index_):
-    up, down, left, right = (1, 1, 1, 1)
-    l, c = index_
-    return [(l-up, c),
-        (l+down, c),
-        (l, c-left),
-        (l, c+right)]
 
 def get_block(index_, *, nb_cells, is_valid_cell):
     if nb_cells == 1:
