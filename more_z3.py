@@ -1,4 +1,4 @@
-from z3 import And, PbEq, Int
+from z3 import And, PbEq, Int, Bool
 import operator
 
 def coerce_comp_op(variabs, vals, comparison_op):
@@ -19,6 +19,11 @@ def coerce_le(variabs, vals):
 
 def IntMatrix(prefix, nb_rows, nb_cols):
     res = [[ Int(f'{prefix}_{i}_{j}') for j in range(nb_cols)]
+                            for i in range(nb_rows) ]
+    return res
+
+def BoolMatrix(prefix, nb_rows, nb_cols):
+    res = [[ Bool(f'{prefix}_{i}_{j}') for j in range(nb_cols)]
                             for i in range(nb_rows) ]
     return res
 
