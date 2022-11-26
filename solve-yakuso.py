@@ -11,16 +11,16 @@ def solve_puzzle_yakuso(puzzle, *, height, width, horizontal_sums):
     range_c = [ And(cell >= 0, cell <= max_possible_number)
             for cell in flatten(board) ]
 
-    def list_contains_n_times_val(lst, n, val):
+    def list_contains_count_times_val(lst, *, count, val):
         return Exactly(*[var == val
-            for var in lst], n)
+            for var in lst], count)
 
     # row contains number n, n times
     row_n_times_n_c = []
     for row in board:
         possibilities = [
-            And(list_contains_n_times_val(row, n, n), #n n times
-                list_contains_n_times_val(row, width - n, 0)) # 0 everywhere else (width-n) times zero
+            And(list_contains_count_times_val(row, count = n, val = n), #n n times
+                list_contains_count_times_val(row, count = width - n, val = 0)) # 0 everywhere else (width-n) times zero
             for n in range(1, max_possible_number + 1)]
         cnstrnt = Exactly(*possibilities, 1)
         row_n_times_n_c.append(cnstrnt)
@@ -28,7 +28,7 @@ def solve_puzzle_yakuso(puzzle, *, height, width, horizontal_sums):
     # whole board contains number n, n times
     whole_n_times_n_c = []
     for n in range(1, max_possible_number + 1):
-        cnstrnt = list_contains_n_times_val(flatten(board), n, n)
+        cnstrnt = list_contains_count_times_val(flatten(board), count = n, val = n)
         whole_n_times_n_c.append(cnstrnt)
 
     at_ = lambda l, c : board[l][c]
