@@ -21,9 +21,6 @@ def solve_puzzle_nanro(*, height, width, cage_ids, instance):
 
     cages_inds = get_same_block_indices(cage_ids)
 
-    max_cage_size = max([ len(inds)
-        for inds in cages_inds.values() ])
-
     # we also force the other elements to be 0. (so as not to have a separate range_c)
     cage_elems_n_n_times_c = []
     for board_indices in cages_inds.values():
